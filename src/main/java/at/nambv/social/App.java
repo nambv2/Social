@@ -1,33 +1,23 @@
 package at.nambv.social;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicNameValuePair;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.blogger.Blogger;
+import com.google.api.services.blogger.Blogger.Posts.Insert;
+import com.google.api.services.blogger.model.Post;
+
+import at.nambv.social.utils.HttpUtils;
+import at.nambv.social.utils.OAuth2Native;
+import at.nambv.social.utils.ReadXML;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -38,72 +28,27 @@ import twitter4j.conf.ConfigurationBuilder;
  *
  */
 public class App {
+	
 	private static final String root = "G:\\TNT\\sitemap\\";
+	
+	//blogger
+	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+	private static final String BLOG_ID = "6616750693444969522";
+	private static final String POST_ID = "8204492164026074197";
+    /*end blogger*/	
+	
 	//twitter
 	private static final String consumerKey = "6q8mmmWnKvQrYE4SJeNV7lSXX";
 	private static final String consumerSecret = "0epofoXE5X02BlzCTwXff3qp8grebt6p9WY5QVPaLlnQY4IImj";
 	private static final String accessToken = "782127930721710083-2sGTsaK1OMXMOfwRZJ4lI1P9v50TnAR";
 	private static final String accessTokenSecret = "Xqlo0HwweDVmpvsIDDgvIq6qV1umWGS3TQXkyU0drUTEs";
+	/*end twitter*/	
+	
+	
 	//facebook
 	private static final String id = "1917504088529056";
 	private static final String token = "EAACEdEose0cBAKC8pZApHoQxKH5UBXlBV9qScaOFIM9mHpvL0NuTjkJUUuPT75qXLJp7JAmGxUkoP6ZAtmQRbyVU9yR9j5FwjQPlX9gMahfkpgraZAOcRZApokUM7dTmamQp0ly8ji4bzddADuDZBcolY8o2ZCZBSEYxZCGoliRLPN0U02dKZClFZBqp7bIYbONTMZD";
-	
-	public static HttpResponse httpGet(String url,
-			HashMap<String, String> headers) {
-		HttpClient client = HttpClientBuilder.create().build();
-		HttpGet get = new HttpGet(url);
-		HttpResponse response;
-		if (headers.size() != 0) {
-			Iterator<Entry<String, String>> i = headers.entrySet().iterator();
-			while (i.hasNext()) {
-				Entry<String, String> e = i.next();
-				get.setHeader(e.getKey(), e.getValue());
-			}
-		}
-		try {
-			response = client.execute(get);
-			return response;
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public static HttpResponse httpPost(String url,
-			HashMap<String, String> headers, HashMap<String, String> params) {
-		HttpClient client = HttpClientBuilder.create().build();
-		HttpPost post = new HttpPost(url);
-		List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
-		if (headers.size() != 0) {
-			Iterator<Entry<String, String>> i = headers.entrySet().iterator();
-			while (i.hasNext()) {
-				Entry<String, String> e = i.next();
-				post.setHeader(e.getKey(), e.getValue());
-			}
-		}
-		if (params.size() != 0) {
-			Iterator<Entry<String, String>> i1 = params.entrySet().iterator();
-			while (i1.hasNext()) {
-				Entry<String, String> e1 = i1.next();
-				urlParameters.add(new BasicNameValuePair(e1.getKey(), e1
-						.getValue()));
-			}
-		}
-		try {
-			post.setEntity(new UrlEncodedFormEntity(urlParameters));
-			HttpResponse response = client.execute(post);
-			return response;
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+	/*end facebook*/	
 
 	public static void facebookApi(String id, String token, String message,
 			String link) {
@@ -115,7 +60,7 @@ public class App {
 		params.put("access_token", token);
 		params.put("message", message);
 		params.put("link", link);
-		HttpResponse response = httpPost(url, headers, params);
+		HttpResponse response = HttpUtils.httpPost(url, headers, params);
 
 	}
 
@@ -135,35 +80,32 @@ public class App {
 			e.printStackTrace();
 		}
 	}
-
-	public static List<String> read(String pathname) {
-		File xml = new File(pathname);
-		List<String> listLink = new ArrayList<String>();
-		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
-				.newInstance();
+	
+	public static void bloggerApi(String msg, String link) {
+		System.out.println("***Post blooger====>"+link);
+		HttpTransport HTTP_TRANSPORT;
 		try {
-			DocumentBuilder builder = builderFactory.newDocumentBuilder();
-			Document doc = builder.parse(xml);
-			doc.getDocumentElement().normalize();
-			NodeList nList = doc.getElementsByTagName("url");
-			for (int temp = 0; temp < nList.getLength(); temp++) {
-				Node nNode = nList.item(temp);
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-					Element eElement = (Element) nNode;
-					String link = eElement.getElementsByTagName("loc").item(0)
-							.getTextContent();
-					listLink.add(link);
-				}
-			}
-			return listLink;
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
+			HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+			Credential credential = OAuth2Native.authorize(HTTP_TRANSPORT, JSON_FACTORY);
+			Blogger blogger = new Blogger.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
+					.setApplicationName("Blogger-PostsGet-Snippet/1.0").build();
+			
+			Post content = new Post();
+			content.setTitle(msg);
+			content.setContent(link);
+
+			Insert postsInsertAction = blogger.posts()
+			        .insert(BLOG_ID, content);
+
+			postsInsertAction.setFields("author/displayName,content,published,title,url");
+
+			Post post = postsInsertAction.execute();
+
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
+		} catch (Throwable t) {
+			t.printStackTrace();
 		}
-		return null;
 	}
 
 	public static void main(String[] args) {
@@ -173,7 +115,8 @@ public class App {
 		twitterApi("Helloworld","http://www.juegos1friv.com/left-to-die.html");
 		System.out.println("Auto post socials");
 		String pathname = root+"sitemap-abcya2017.com";
-		List<String> links = read(pathname);
+		String msg = "";
+		List<String> links = ReadXML.read(pathname);
 		for(String link : links) {
 			twitterApi(msg, link);
 		}

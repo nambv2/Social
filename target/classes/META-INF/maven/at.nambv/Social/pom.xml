@@ -48,6 +48,45 @@
     <artifactId>twitter4j-core</artifactId>
     <version>4.0.4</version>
 </dependency>
-
+<dependency>
+    <groupId>com.google.api-client</groupId>
+    <artifactId>google-api-client</artifactId>
+    <version>1.21.0</version>
+</dependency>
+ <dependency>
+      <groupId>com.google.apis</groupId>
+      <artifactId>google-api-services-blogger</artifactId>
+      <version>v3-rev54-1.22.0</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.google.apis/google-api-services-oauth2 -->
+<dependency>
+    <groupId>com.google.apis</groupId>
+    <artifactId>google-api-services-oauth2</artifactId>
+    <version>v2-rev36-1.14.2-beta</version>
+</dependency>
+    
+    <dependency>
+     <groupId>com.google.oauth-client</groupId>
+     <artifactId>google-oauth-client</artifactId>
+     <version>1.14.1-beta</version>
+ </dependency>
+    <!-- https://mvnrepository.com/artifact/com.google.oauth-client/google-oauth-client -->
+<dependency>
+    <groupId>com.google.oauth-client</groupId>
+    <artifactId>google-oauth-client</artifactId>
+    <version>1.22.0</version>
+</dependency>
+    <!-- https://mvnrepository.com/artifact/com.google.oauth-client/google-oauth-client-java6 -->
+<dependency>
+    <groupId>com.google.oauth-client</groupId>
+    <artifactId>google-oauth-client-java6</artifactId>
+    <version>1.22.0</version>
+</dependency>
+    <!-- https://mvnrepository.com/artifact/com.google.oauth-client/google-oauth-client-jetty -->
+<dependency>
+    <groupId>com.google.oauth-client</groupId>
+    <artifactId>google-oauth-client-jetty</artifactId>
+    <version>1.11.0-beta</version>
+</dependency>
   </dependencies>
 </project>

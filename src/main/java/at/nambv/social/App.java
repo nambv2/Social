@@ -9,12 +9,17 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.http.HttpResponse;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -47,6 +52,8 @@ public class App {
 	
 	//blogger
 	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+	private static final String HOST="https://www.gamespot.com";
+	private static final String CATE="/reviews/?page=";
 	/*
 	private static final String root = "G:\\TNT\\sitemap\\";
 	
@@ -152,13 +159,14 @@ public class App {
 		}
 	}
 	
-	public static void postBlogWithData(String host, String category, String linkFromSitemap) {
+	public static void postBlogWithData(String host, String category, String linkFromSitemap,int count) {
 			//url ="https://www.gamespot.com/reviews/?page=1"
 			String url = host + category;
 			Element html = Jsoup.parse(HttpUtils.httpURLGET(url));
 			Element gameArea = html.getElementById("js-sort-filter-results");
 			Elements gameList = gameArea.select("section article a");
 			Element e;
+			int number = 0;
 			for(int i = 0; i < gameList.size(); i++) {
 				e = gameList.get(i);
 				String link = e.select(".js-event-tracking").attr("href").toString();
@@ -172,15 +180,16 @@ public class App {
 				br.append("\">");
 				br.append(linkFromSitemap);
 				br.append("</a>");
-				System.out.println(br.toString());
 				bloggerApi(title,br.toString());
-				break;
+				number++;
+				if(count == number) break;
 			}
 	}
 	
-	public static List<String> read(String pathname) {
+	public static void read(String pathname,int count,int page) {
 		File xml = new File(pathname);
 		List<String> listLink = new ArrayList<String>();
+		int number = 0;
 		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
 				.newInstance();
 		try {
@@ -192,27 +201,47 @@ public class App {
 				Node nNode = nList.item(temp);
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 					org.w3c.dom.Element eElement = (org.w3c.dom.Element) nNode;
+					if(eElement.getAttribute("used") == null) continue;
 					String link = eElement.getElementsByTagName("loc").item(0)
 							.getTextContent();
 					listLink.add(link);
+					eElement.setAttribute("used", "true");
+					postBlogWithData(HOST, CATE+String.valueOf(page), link,count);
+					
+					// write the content into xml file
+					TransformerFactory transformerFactory = TransformerFactory.newInstance();
+					Transformer transformer = transformerFactory.newTransformer();
+					DOMSource source = new DOMSource(doc);
+					StreamResult result = new StreamResult(new File(pathname));
+					transformer.transform(source, result);
+					number++;
+					if(number == count) break;
 				}
 			}
-			return listLink;
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (TransformerConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		return null;
 	}
 
 	public static void main(String[] args) {
 		String msg = "A test post";
 		String link = "With <code>HTML</code> content";
+		String count = "2";
+		String pageStart = "2";
+		String pageFinish = "4";
 		init("src/main/resources/config.txt");
-		postBlogWithData("https://www.gamespot.com", "/reviews/?page=1", "http://www.juegos1friv.com/left-to-die.html");
-		List<String> links = ReadXML.read(siteMap);
+		for(int i = Integer.parseInt(pageStart); i <= Integer.parseInt(pageFinish); i++) {
+			read(siteMap, Integer.parseInt(count),i);
+		}
 	}
 }

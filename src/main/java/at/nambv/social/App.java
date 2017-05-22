@@ -1,12 +1,24 @@
 package at.nambv.social;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.http.HttpResponse;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import twitter4j.Status;
 import twitter4j.Twitter;
@@ -16,6 +28,7 @@ import twitter4j.conf.ConfigurationBuilder;
 import at.nambv.social.utils.Config;
 import at.nambv.social.utils.HttpUtils;
 import at.nambv.social.utils.OAuth2Native;
+import at.nambv.social.utils.ReadXML;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -111,8 +124,8 @@ public class App {
 		}
 	}
 	
-	public static void bloggerApi(String msg, String link) {
-		System.out.println("***Post blooger====>"+link);
+	public static void bloggerApi(String title, String msg) {
+		System.out.println("***Post blooger====>"+title);
 		HttpTransport HTTP_TRANSPORT;
 		try {
 			HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
@@ -121,8 +134,8 @@ public class App {
 					.setApplicationName("Blogger-PostsGet-Snippet/1.0").build();
 			
 			Post content = new Post();
-			content.setTitle(msg);
-			content.setContent(link);
+			content.setTitle(title);
+			content.setContent(msg);
 
 			Insert postsInsertAction = blogger.posts()
 			        .insert(blogId, content);
@@ -152,31 +165,54 @@ public class App {
 				String title = e.select(".media-title").text();
 				Element conElement = Jsoup.parse(HttpUtils.httpURLGET(host+link));
 				String content = conElement.select(".js-content-entity-body").text();
+				StringBuffer br = new StringBuffer(content);
+				br.append("</br>");
+				br.append("<i>You can play and experience more game in here</i> <a href=\"");
+				br.append(linkFromSitemap);
+				br.append("\">");
+				br.append(linkFromSitemap);
+				br.append("</a>");
+				System.out.println(br.toString());
+				bloggerApi(title,br.toString());
+				break;
 			}
+	}
+	
+	public static List<String> read(String pathname) {
+		File xml = new File(pathname);
+		List<String> listLink = new ArrayList<String>();
+		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
+				.newInstance();
+		try {
+			DocumentBuilder builder = builderFactory.newDocumentBuilder();
+			Document doc = builder.parse(xml);
+			doc.getDocumentElement().normalize();
+			NodeList nList = doc.getElementsByTagName("url");
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+				Node nNode = nList.item(temp);
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+					org.w3c.dom.Element eElement = (org.w3c.dom.Element) nNode;
+					String link = eElement.getElementsByTagName("loc").item(0)
+							.getTextContent();
+					listLink.add(link);
+				}
+			}
+			return listLink;
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static void main(String[] args) {
 		String msg = "A test post";
 		String link = "With <code>HTML</code> content";
-		init("resource/config.txt");
-		bloggerApi(msg, link);
-		/*String token = "EAACEdEose0cBAKpMZBZBmUlKQ2qTB8u4sFoQL911FezbApqaVl7l7CZBzbD65sow3ETfRuh78HATZAp15Gq1A9ZCQYhkTsc0C3oUWDmSp6rak7QFUeAoSKSU4ovBwzbQRkwMoTh7XA4E9X2YuiT6hcazHWrFBoxaUDZBolTiUIQ9bdjeZAvZAo54WY3RcjJIgokZD";
+		init("src/main/resources/config.txt");
+		postBlogWithData("https://www.gamespot.com", "/reviews/?page=1", "http://www.juegos1friv.com/left-to-die.html");
 		List<String> links = ReadXML.read(siteMap);
-		facebookApi(id, token, msg, link);*/
-		/*for(String link : links) {
-			//twitterApi(msg, link);
-			//bloggerApi(msg, link);
-		}*/
-		//twitterApi("Helloworld",link);
-		//bloggerApi(msg, link);
-		//facebookApi(id, token, msg, link);
-		/*twitterApi("Helloworld","http://www.juegos1friv.com/left-to-die.html");
-		System.out.println("Auto post socials");
-		String msg = "";
-		List<String> links = ReadXML.read(siteMap);
-		for(String link : links) {
-			twitterApi(msg, link);
-		}*/
-		
 	}
 }

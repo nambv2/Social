@@ -32,7 +32,11 @@ public class ReadXML {
 					Element eElement = (Element) nNode;
 					String link = eElement.getElementsByTagName("loc").item(0)
 							.getTextContent();
+					//doc.renameNode(nNode, null, "done-url");
+					eElement.setAttribute("aaa", "111");
+					System.out.println(eElement.getNodeName());
 					listLink.add(link);
+					break;
 				}
 			}
 			return listLink;
@@ -44,5 +48,9 @@ public class ReadXML {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public static void main(String args[]) {
+		read("src/main/resources/sitemap-abcya2017.com.xml");
 	}
 }

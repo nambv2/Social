@@ -2,9 +2,20 @@ package at.nambv.social;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 
 import org.apache.http.HttpResponse;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import twitter4j.Status;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.conf.ConfigurationBuilder;
+import at.nambv.social.utils.Config;
+import at.nambv.social.utils.HttpUtils;
+import at.nambv.social.utils.OAuth2Native;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -14,16 +25,6 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.blogger.Blogger;
 import com.google.api.services.blogger.Blogger.Posts.Insert;
 import com.google.api.services.blogger.model.Post;
-
-import at.nambv.social.utils.Config;
-import at.nambv.social.utils.HttpUtils;
-import at.nambv.social.utils.OAuth2Native;
-import at.nambv.social.utils.ReadXML;
-import twitter4j.Status;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.conf.ConfigurationBuilder;
 
 /**
  * Hello world!
@@ -137,16 +138,35 @@ public class App {
 			t.printStackTrace();
 		}
 	}
+	
+	public static void postBlogWithData(String host, String category, String linkFromSitemap) {
+			//url ="https://www.gamespot.com/reviews/?page=1"
+			String url = host + category;
+			Element html = Jsoup.parse(HttpUtils.httpURLGET(url));
+			Element gameArea = html.getElementById("js-sort-filter-results");
+			Elements gameList = gameArea.select("section article a");
+			Element e;
+			for(int i = 0; i < gameList.size(); i++) {
+				e = gameList.get(i);
+				String link = e.select(".js-event-tracking").attr("href").toString();
+				String title = e.select(".media-title").text();
+				Element conElement = Jsoup.parse(HttpUtils.httpURLGET(host+link));
+				String content = conElement.select(".js-content-entity-body").text();
+			}
+	}
 
 	public static void main(String[] args) {
-		String msg = "Welcome all";
-		//String link = "http://www.abcya2017.com/wolfenstein-3d.html";
+		String msg = "A test post";
+		String link = "With <code>HTML</code> content";
 		init("resource/config.txt");
+		bloggerApi(msg, link);
+		/*String token = "EAACEdEose0cBAKpMZBZBmUlKQ2qTB8u4sFoQL911FezbApqaVl7l7CZBzbD65sow3ETfRuh78HATZAp15Gq1A9ZCQYhkTsc0C3oUWDmSp6rak7QFUeAoSKSU4ovBwzbQRkwMoTh7XA4E9X2YuiT6hcazHWrFBoxaUDZBolTiUIQ9bdjeZAvZAo54WY3RcjJIgokZD";
 		List<String> links = ReadXML.read(siteMap);
-		for(String link : links) {
+		facebookApi(id, token, msg, link);*/
+		/*for(String link : links) {
 			//twitterApi(msg, link);
-			bloggerApi(msg, link);
-		}
+			//bloggerApi(msg, link);
+		}*/
 		//twitterApi("Helloworld",link);
 		//bloggerApi(msg, link);
 		//facebookApi(id, token, msg, link);

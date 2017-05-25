@@ -22,11 +22,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class ReadXML {
-	public static List<String> read(String pathname) {
+	public static List<String> read(String pathname, int numberOfLink) {
 		File xml = new File(pathname);
 		List<String> listLink = new ArrayList<String>();
 		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
 				.newInstance();
+		int count = 0;
 		try {
 			DocumentBuilder builder = builderFactory.newDocumentBuilder();
 			Document doc = builder.parse(xml);
@@ -36,6 +37,7 @@ public class ReadXML {
 				Node nNode = nList.item(temp);
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 					Element eElement = (Element) nNode;
+					if("true".equalsIgnoreCase(eElement.getAttribute("used"))) continue;
 					String link = eElement.getElementsByTagName("loc").item(0)
 							.getTextContent();
 					//doc.renameNode(nNode, null, "done-url");
@@ -47,6 +49,10 @@ public class ReadXML {
 					DOMSource source = new DOMSource(doc);
 					StreamResult result = new StreamResult(new File(pathname));
 					transformer.transform(source, result);
+					//
+					count++;
+					if(count == numberOfLink) break;
+					
 				}
 			}
 			return listLink;
@@ -67,6 +73,6 @@ public class ReadXML {
 	}
 	
 	public static void main(String args[]) {
-		read("src/main/resources/sitemap.com.xml");
+		read("src/main/resources/sitemap.com.xml", 2);
 	}
 }

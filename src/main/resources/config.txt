@@ -1,5 +1,5 @@
 //path file sitemap
-path_sitemap=G:\TNT\sitemap\sitemap-abcya2017.com.xml
+path_sitemap=G:\TNT\sitemap\sitemap.com.xml
 //blogger
 blog_id=6616750693444969522
 //twitter

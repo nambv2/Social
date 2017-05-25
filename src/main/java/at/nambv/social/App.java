@@ -85,6 +85,8 @@ public class App {
 	private static String accessTokenSecret;
 	private static String id;
 	private static String token;
+	private static String currentPage;
+	private static String currentArticle;
 	
 	
 	public static void init(String cfgPath) {
@@ -97,6 +99,9 @@ public class App {
 		accessTokenSecret=cfg.get("access_token_secret");
 		id=cfg.get("facebook_id");
 		token=cfg.get("facebook_token");
+		currentPage = cfg.get("current_pape");
+		currentArticle = cfg.get("current_article");
+		
 	}
 
 	public static void facebookApi(String id, String token, String message,
@@ -159,7 +164,7 @@ public class App {
 		}
 	}
 	
-	public static void postBlogWithData(String host, String category, String linkFromSitemap,int count) {
+	/*public static void postBlogWithData(String host, String category, String linkFromSitemap,int count) {
 			//url ="https://www.gamespot.com/reviews/?page=1"
 			String url = host + category;
 			Element html = Jsoup.parse(HttpUtils.httpURLGET(url));
@@ -184,9 +189,44 @@ public class App {
 				number++;
 				if(count == number) break;
 			}
+	}*/
+	public static void getArticle(String pageCurrent, List<String> links) {
+		String url = HOST + CATE;
+		int numberOfLink = links.size();
+		Element html = Jsoup.parse(HttpUtils.httpURLGET(url));
+		Element gameArea = html.getElementById("js-sort-filter-results");
+		Elements gameList = gameArea.select("section article a");
+		Element e;
+		int number = 0;
+		//local storage number of page
+		
+		//
+		for(String link : links) {
+			for(int i = 0; i < gameList.size(); i++) {
+				
+			}
+		}
+		/*for(int i = 0; i < gameList.size(); i++) {
+			e = gameList.get(i);
+			String link = e.select(".js-event-tracking").attr("href").toString();
+			String title = e.select(".media-title").text();
+			Element conElement = Jsoup.parse(HttpUtils.httpURLGET(HOST+link));
+			String content = conElement.select(".js-content-entity-body").text();
+			
+			StringBuffer br = new StringBuffer(content);
+			br.append("</br>");
+			br.append("<i>You can play and experience more game in here</i> <a href=\"");
+			br.append(linkFromSitemap);
+			br.append("\">");
+			br.append(linkFromSitemap);
+			br.append("</a>");
+			bloggerApi(title,br.toString());
+			number++;
+			if(count == number) break;
+		}*/
 	}
 	
-	public static void read(String pathname,int count,int page) {
+	/*public static void read(String pathname,int count,int page) {
 		File xml = new File(pathname);
 		List<String> listLink = new ArrayList<String>();
 		int number = 0;
@@ -231,10 +271,10 @@ public class App {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+	}*/
 
 	public static void main(String[] args) {
-		String msg = "A test post";
+		/*String msg = "A test post";
 		String link = "With <code>HTML</code> content";
 		String count = "2";
 		String pageStart = "2";
@@ -242,6 +282,10 @@ public class App {
 		init("src/main/resources/config.txt");
 		for(int i = Integer.parseInt(pageStart); i <= Integer.parseInt(pageFinish); i++) {
 			read(siteMap, Integer.parseInt(count),i);
-		}
+		}*/
+		String numberOfLink = "3";
+		String pageNumber = "1";
+		List<String> links = ReadXML.read(siteMap, Integer.parseInt(numberOfLink));
+		
 	}
 }

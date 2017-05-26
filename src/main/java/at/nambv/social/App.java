@@ -164,49 +164,33 @@ public class App {
 		}
 	}
 	
-	/*public static void postBlogWithData(String host, String category, String linkFromSitemap,int count) {
-			//url ="https://www.gamespot.com/reviews/?page=1"
-			String url = host + category;
-			Element html = Jsoup.parse(HttpUtils.httpURLGET(url));
-			Element gameArea = html.getElementById("js-sort-filter-results");
-			Elements gameList = gameArea.select("section article a");
-			Element e;
-			int number = 0;
-			for(int i = 0; i < gameList.size(); i++) {
-				e = gameList.get(i);
-				String link = e.select(".js-event-tracking").attr("href").toString();
-				String title = e.select(".media-title").text();
-				Element conElement = Jsoup.parse(HttpUtils.httpURLGET(host+link));
-				String content = conElement.select(".js-content-entity-body").text();
-				StringBuffer br = new StringBuffer(content);
-				br.append("</br>");
-				br.append("<i>You can play and experience more game in here</i> <a href=\"");
-				br.append(linkFromSitemap);
-				br.append("\">");
-				br.append(linkFromSitemap);
-				br.append("</a>");
-				bloggerApi(title,br.toString());
-				number++;
-				if(count == number) break;
-			}
-	}*/
-	public static void getArticle(String pageCurrent, List<String> links) {
-		String url = HOST + CATE;
-		int numberOfLink = links.size();
+	public static Elements getArticleNextPage(String url, Elements existedE) {
+		Element html = Jsoup.parse(HttpUtils.httpURLGET(url));
+		Element gameArea = html.getElementById("js-sort-filter-results");
+		Elements gameList = gameArea.select("section article a");
+		for(int i = 0; i < gameList.size(); i++) {
+			existedE.add(gameList.get(i));
+		}
+		return existedE;
+		
+	}
+	public static void getArticle(int pageCurrent, List<String> links) {
+		String gamePage = HOST + CATE;
+		String url = gamePage + String.valueOf(pageCurrent);
 		Element html = Jsoup.parse(HttpUtils.httpURLGET(url));
 		Element gameArea = html.getElementById("js-sort-filter-results");
 		Elements gameList = gameArea.select("section article a");
 		Element e;
-		int number = 0;
-		//local storage number of page
-		
-		//
-		for(String link : links) {
-			for(int i = 0; i < gameList.size(); i++) {
-				
-			}
+		int sizeGameList = gameList.size(); 
+		while(links.size() > sizeGameList) {
+			pageCurrent++;
+			String nextPage = gamePage + pageCurrent;
+			gameList = getArticleNextPage(nextPage,gameList);
+			sizeGameList = gameList.size();
 		}
-		/*for(int i = 0; i < gameList.size(); i++) {
+		
+		for(int i = 0; i < links.size(); i++) {
+			String linkFromSitemap = links.get(i);
 			e = gameList.get(i);
 			String link = e.select(".js-event-tracking").attr("href").toString();
 			String title = e.select(".media-title").text();
@@ -220,58 +204,11 @@ public class App {
 			br.append("\">");
 			br.append(linkFromSitemap);
 			br.append("</a>");
+			
+			//
 			bloggerApi(title,br.toString());
-			number++;
-			if(count == number) break;
-		}*/
-	}
-	
-	/*public static void read(String pathname,int count,int page) {
-		File xml = new File(pathname);
-		List<String> listLink = new ArrayList<String>();
-		int number = 0;
-		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
-				.newInstance();
-		try {
-			DocumentBuilder builder = builderFactory.newDocumentBuilder();
-			Document doc = builder.parse(xml);
-			doc.getDocumentElement().normalize();
-			NodeList nList = doc.getElementsByTagName("url");
-			for (int temp = 0; temp < nList.getLength(); temp++) {
-				Node nNode = nList.item(temp);
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-					org.w3c.dom.Element eElement = (org.w3c.dom.Element) nNode;
-					if(eElement.getAttribute("used") == null) continue;
-					String link = eElement.getElementsByTagName("loc").item(0)
-							.getTextContent();
-					listLink.add(link);
-					eElement.setAttribute("used", "true");
-					postBlogWithData(HOST, CATE+String.valueOf(page), link,count);
-					
-					// write the content into xml file
-					TransformerFactory transformerFactory = TransformerFactory.newInstance();
-					Transformer transformer = transformerFactory.newTransformer();
-					DOMSource source = new DOMSource(doc);
-					StreamResult result = new StreamResult(new File(pathname));
-					transformer.transform(source, result);
-					number++;
-					if(number == count) break;
-				}
-			}
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (TransformerConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-	}*/
+	}
 
 	public static void main(String[] args) {
 		/*String msg = "A test post";
@@ -284,8 +221,9 @@ public class App {
 			read(siteMap, Integer.parseInt(count),i);
 		}*/
 		String numberOfLink = "3";
-		String pageNumber = "1";
+		int pageCurrent=1;
 		List<String> links = ReadXML.read(siteMap, Integer.parseInt(numberOfLink));
+		getArticle(pageCurrent, links);
 		
 	}
 }

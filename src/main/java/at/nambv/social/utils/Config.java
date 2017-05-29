@@ -22,6 +22,7 @@ public class Config {
 			
 			while((currentLine = bf.readLine()) != null) {
 				if ("//".equals(currentLine.substring(0, 2).toString())) continue;
+				if("".equals(currentLine.trim())) continue;
 				listCfg.put(currentLine.split("=")[0], currentLine.split("=")[1]);
 			}
 			return (HashMap<String, String>) listCfg;

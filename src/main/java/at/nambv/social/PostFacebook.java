@@ -10,6 +10,7 @@ import at.nambv.social.utils.HttpUtils;
 public class PostFacebook implements AutoPostHandler{
 
 	public void autoPost(String msg, List<String> links, HashMap<String, String> attrs) {
+		System.out.println("hrerererererer");
 		String token = attrs.get("token");
 		String pageId = attrs.get("pageId");
 		String url = "https://graph.facebook.com/"+pageId+"/feed";

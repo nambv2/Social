@@ -1,18 +1,21 @@
 package at.nambv.social;
 
 public class AutoPostHandlerFactory {
-	public static PostFacebook postFacebook;
-	public static PostTwitter postTwitter;
-	public static PostBlog postBlog;
+	public static PostFacebook postFacebook = new PostFacebook();
+	public static PostTwitter postTwitter = new PostTwitter();
+	public static PostBlog postBlog = new PostBlog();
 	public AutoPostHandler getHandler(String type) {
 		PostType postType = PostType.valueOf(type);
-		if(postType.equals(PostType.FB)) {
+		if(postType == PostType.FACEBOOK) {
+			System.out.println("fb");
 			return postFacebook;
 		}
-		if(postType.equals(PostType.TWT)) {
+		if(postType == PostType.TWITTER) {
+			System.out.println("tw");
 			return postTwitter;
 		}
-		if(postType.equals(PostType.BLOG)) {
+		if(postType == PostType.BLOG) {
+			System.out.println("blog");
 			return postBlog;
 		}
 		return null;

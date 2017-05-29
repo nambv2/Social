@@ -1,9 +1,9 @@
 //attribute
-post_type=facebook,twitter,blog
+post_type=facebook
 post_number=5
 current_pape=1
 //path file sitemap
-path_sitemap=G:\TNT\sitemap\sitemap.com.xml
+path_sitemap=src/main/resources/sitemap.com.xml
 //blogger
 blog_id=6616750693444969522
 //twitter

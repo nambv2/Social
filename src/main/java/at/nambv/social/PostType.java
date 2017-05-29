@@ -1,8 +1,8 @@
 package at.nambv.social;
 
 public enum PostType {
-	FB("FACEBOOK"),
-	TWT("TWITTER"),
+	FACEBOOK("FACEBOOK"),
+	TWITTER("TWITTER"),
 	BLOG("BLOG");
 	private String type;
 	private PostType(String type) {

@@ -1,6 +1,5 @@
 package at.nambv.social;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,7 +42,7 @@ public class AutoPostRunable {
 	}
 	//
 	public static void main(String args[]) {
-		init("src/main/resources/config.txt");
+		init("src/main/resources/config.properties");
 		for(int i = 0; i < postType.split(",").length; i++) {
 			String type = postType.split(",")[i].toUpperCase();
 			AutoPostHandlerFactory  factory = new AutoPostHandlerFactory();

@@ -1,3 +1,7 @@
+//attribute
+post_type=facebook,twitter,blog
+post_number=5
+current_pape=1
 //path file sitemap
 path_sitemap=G:\TNT\sitemap\sitemap.com.xml
 //blogger
@@ -10,3 +14,5 @@ access_token_secret=Xqlo0HwweDVmpvsIDDgvIq6qV1umWGS3TQXkyU0drUTEs
 //facebook
 facebook_id=1917504088529056
 facebook_token=EAACEdEose0cBAJrbKp0L2qevJm17EbzZAZAEVKXZBsMm2z8Ryaj6Sq8ZCWt1MQF1s13gh9qvCPVMs5YPpJpjMbi16Ngb9NoR2VQO0cRUs97IJZCglYglQsSet9FZBni3CuxqXiYlcSbgzUeDZBIrC0LKeBW37O17NJwZBqqpWRz3aS8SElXlKZBLOIVg7FzZAcwPAZD
+//content_blog
+content_blog=You can play and experience more game in here

@@ -83,10 +83,11 @@ public class App {
 	private static String consumerSecret;
 	private static String accessToken;
 	private static String accessTokenSecret;
-	private static String id;
+	private static String pageId;
 	private static String token;
 	private static String currentPage;
 	private static String currentArticle;
+	private static String contentBlog;
 	
 	
 	public static void init(String cfgPath) {
@@ -97,10 +98,11 @@ public class App {
 		consumerSecret=cfg.get("consumer_secret");
 		accessToken=cfg.get("access_token");
 		accessTokenSecret=cfg.get("access_token_secret");
-		id=cfg.get("facebook_id");
+		pageId=cfg.get("facebook_id");
 		token=cfg.get("facebook_token");
 		currentPage = cfg.get("current_pape");
 		currentArticle = cfg.get("current_article");
+		contentBlog = cfg.get("content_blog");
 		
 	}
 
@@ -199,7 +201,9 @@ public class App {
 			
 			StringBuffer br = new StringBuffer(content);
 			br.append("</br>");
-			br.append("<i>You can play and experience more game in here</i> <a href=\"");
+			br.append("<i>");
+			br.append(contentBlog);
+			br.append("</i> <a href=\"");
 			br.append(linkFromSitemap);
 			br.append("\">");
 			br.append(linkFromSitemap);

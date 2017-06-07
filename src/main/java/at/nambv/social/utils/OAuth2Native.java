@@ -3,6 +3,7 @@
  */
 package at.nambv.social.utils;
 
+import java.io.File;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
@@ -23,14 +24,12 @@ import com.google.api.services.blogger.BloggerScopes;
  */
 public class OAuth2Native {
 	  /** Directory to store user credentials. */
-	  private static final java.io.File DATA_STORE_DIR =
-	      new java.io.File("/Users/nambv/oauth2_sample");
 	  private static FileDataStoreFactory dataStoreFactory;
 	  private static GoogleClientSecrets clientSecrets;
-	  public static Credential authorize(HttpTransport httpTransport, JsonFactory JSON_FACTORY) throws Exception {
+	  public static Credential authorize(HttpTransport httpTransport, JsonFactory JSON_FACTORY, String resourcePath) throws Exception {
+		File dataStoreDir = new File(resourcePath);
 	    // load client secrets
-		dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
-		System.out.println(OAuth2Native.class.getResourceAsStream("client_secrets.json"));
+		dataStoreFactory = new FileDataStoreFactory(dataStoreDir);
 	    clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
 	        new InputStreamReader(OAuth2Native.class.getResourceAsStream("/client_secrets.json")));
 	    if (clientSecrets.getDetails().getClientId().startsWith("Enter")

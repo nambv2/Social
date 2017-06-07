@@ -7,15 +7,12 @@ public class AutoPostHandlerFactory {
 	public AutoPostHandler getHandler(String type) {
 		PostType postType = PostType.valueOf(type);
 		if(postType == PostType.FACEBOOK) {
-			System.out.println("fb");
 			return postFacebook;
 		}
 		if(postType == PostType.TWITTER) {
-			System.out.println("tw");
 			return postTwitter;
 		}
 		if(postType == PostType.BLOG) {
-			System.out.println("blog");
 			return postBlog;
 		}
 		return null;

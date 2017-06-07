@@ -143,7 +143,7 @@ public class App {
 		HttpTransport HTTP_TRANSPORT;
 		try {
 			HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-			Credential credential = OAuth2Native.authorize(HTTP_TRANSPORT, JSON_FACTORY);
+			Credential credential = OAuth2Native.authorize(HTTP_TRANSPORT, JSON_FACTORY, "");
 			Blogger blogger = new Blogger.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
 					.setApplicationName("Blogger-PostsGet-Snippet/1.0").build();
 			

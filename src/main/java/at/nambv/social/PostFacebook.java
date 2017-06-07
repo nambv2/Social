@@ -9,8 +9,7 @@ import at.nambv.social.utils.HttpUtils;
 
 public class PostFacebook implements AutoPostHandler{
 
-	public void autoPost(String msg, List<String> links, HashMap<String, String> attrs) {
-		System.out.println("hrerererererer");
+	public boolean autoPost(String msg, List<String> links, HashMap<String, String> attrs) {
 		String token = attrs.get("token");
 		String pageId = attrs.get("pageId");
 		String url = "https://graph.facebook.com/"+pageId+"/feed";
@@ -22,8 +21,11 @@ public class PostFacebook implements AutoPostHandler{
 			params.put("access_token", token);
 			params.put("link", link);
 			HttpResponse response = HttpUtils.httpPost(url, headers, params);
-			System.out.println("response:"+response);
+			if(response.getStatusLine().getStatusCode() == 200)
+			return true;
+			return false;
 		}
+		return false;
 	}
 
 }

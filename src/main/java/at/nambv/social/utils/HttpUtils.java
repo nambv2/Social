@@ -89,7 +89,6 @@ public class HttpUtils {
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("GET");
 			con.setRequestProperty("User-Agent", "Mozilla/5.0");
-
 			BufferedReader in = new BufferedReader(
 			        new InputStreamReader(con.getInputStream()));
 			String inputLine;
@@ -101,12 +100,19 @@ public class HttpUtils {
 			in.close();
 			return response.toString();
 		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (ProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			return null;
+		} catch (ProtocolException e1) {
+			return null;
+		} catch (IOException e2) {
+			return null;
 		}
-		return null;
+	}
+	public static void main(String args[]) {
+		String response = httpURLGET("https://www.gamespot.com/reviews/?page=3");
+		if(response != null) {
+			System.out.println("goood");
+		} else {
+			System.out.println("errrrrrrror");
+		}
 	}
 }

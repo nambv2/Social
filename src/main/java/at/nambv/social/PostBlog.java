@@ -23,8 +23,8 @@ import at.nambv.social.utils.OAuth2Native;
 public class PostBlog implements AutoPostHandler{
 	
 	private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-	private static final String HOST="https://www.gamespot.com";
-	private static final String CATE="/reviews/?page=";
+//	private static final String HOST="https://www.gamespot.com";
+//	private static final String CATE="/reviews/?page=";
 	
 	public static Elements getArticleNextPage(String url, Elements existedE, int size) {
 		Element html = Jsoup.parse(HttpUtils.httpURLGET(url));
@@ -38,50 +38,28 @@ public class PostBlog implements AutoPostHandler{
 		
 	}
 	
-	public static void getArticle(int pageCurrent, List<String> links, String blogId, String contentBlog) {
-		String gamePage = HOST + CATE;
-		String url = gamePage + String.valueOf(pageCurrent);
-		Element html = Jsoup.parse(HttpUtils.httpURLGET(url));
-		Element gameArea = html.getElementById("js-sort-filter-results");
-		Elements gameList = gameArea.select("section article a");
-		Element e;
-		int sizeGameList = gameList.size(); 
-		while(links.size() > sizeGameList) {
-			pageCurrent++;
-			String nextPage = gamePage + pageCurrent;
-			gameList = getArticleNextPage(nextPage,gameList,links.size());
-			sizeGameList = gameList.size();
-		}
+	public static boolean getArticle(int pageCurrent, List<String> links, String blogId, String contentBlog, String resourcePath,int counter, String titleCraw, String contentCraw) {
 		
-		for(int i = 0; i < links.size(); i++) {
-			String linkFromSitemap = links.get(i);
-			e = gameList.get(i);
-			String link = e.select(".js-event-tracking").attr("href").toString();
-			String title = e.select(".media-title").text();
-			Element conElement = Jsoup.parse(HttpUtils.httpURLGET(HOST+link));
-			String content = conElement.select(".js-content-entity-body").text();
-			
-			StringBuffer br = new StringBuffer(content);
-			br.append("</br>");
-			br.append("<i>");
-			br.append(contentBlog);
-			br.append("</i> <a href=\"");
-			br.append(linkFromSitemap);
-			br.append("\">");
-			br.append(linkFromSitemap);
-			br.append("</a>");
-			
-			//
-			bloggerApi(title,br.toString(), blogId);
-		}
+		StringBuffer br = new StringBuffer(contentCraw);
+		br.append("</br>");
+		br.append("<i>");
+		br.append(contentBlog);
+		br.append("</i> <a href=\"");
+		br.append(links.get(0));
+		br.append("\">");
+		br.append(links.get(0));
+		br.append("</a>");
+		
+		//
+		return bloggerApi(titleCraw,br.toString(), blogId, resourcePath);
 	}
 	
-	public static void bloggerApi(String title, String msg, String blogId) {
+	public static boolean bloggerApi(String title, String msg, String blogId, String resourcePath) {
 		System.out.println("***Post blooger====>"+title);
 		HttpTransport HTTP_TRANSPORT;
 		try {
 			HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-			Credential credential = OAuth2Native.authorize(HTTP_TRANSPORT, JSON_FACTORY);
+			Credential credential = OAuth2Native.authorize(HTTP_TRANSPORT, JSON_FACTORY, resourcePath);
 			Blogger blogger = new Blogger.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
 					.setApplicationName("Blogger-PostsGet-Snippet/1.0").build();
 			
@@ -95,21 +73,27 @@ public class PostBlog implements AutoPostHandler{
 			postsInsertAction.setFields("author/displayName,content,published,title,url");
 
 			Post post = postsInsertAction.execute();
-			System.out.println("response: "+post.getStatus());
+			return true;
 
 		} catch (IOException e) {
-			System.err.println(e.getMessage());
+			e.printStackTrace();
+			return false;
 		} catch (Throwable t) {
 			t.printStackTrace();
+			return false;
 		}
 	}
 	
 	
-	public void autoPost(String msg, List<String> links, HashMap<String, String> attrs) {
+	public boolean autoPost(String msg, List<String> links, HashMap<String, String> attrs) {
 		String blogId = attrs.get("blogId");
 		String pageCurrent = attrs.get("currentPage");
 		String contentBlog = attrs.get("contentBlog");
-		getArticle(Integer.valueOf(pageCurrent), links, blogId, contentBlog);
+		String resourcePath = attrs.get("resourcePath");
+		int counter = Integer.valueOf(attrs.get("counter"));
+		String titleCraw = attrs.get("titleCraw");
+		String contentCraw = attrs.get("contentCraw");
+		return getArticle(Integer.valueOf(pageCurrent), links, blogId, contentBlog, resourcePath,counter,titleCraw, contentCraw);
 	}
 
 }

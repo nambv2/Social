@@ -17,7 +17,7 @@ public class PostTwitter implements AutoPostHandler{
 	private static String accessToken;
 	private static String accessTokenSecret;
 
-	public void autoPost(String msg, List<String> links, HashMap<String, String> attrs) {
+	public boolean autoPost(String msg, List<String> links, HashMap<String, String> attrs) {
 		//Load config 
 		consumerKey = attrs.get("consumerKey");
 		consumerSecret= attrs.get("consumerSecret");
@@ -36,11 +36,13 @@ public class PostTwitter implements AutoPostHandler{
 			try {
 				System.out.println("***Post twitter====>"+link);
 				Status status = twitter.updateStatus(link);
-				System.out.println("response: "+status);
+				return true;
 			} catch (TwitterException e) {
-				e.printStackTrace();
+				System.out.println(e);
+				return false;
 			}
 		}
+		return false;
 	}
 	
 }

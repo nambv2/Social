@@ -33,9 +33,10 @@ public class Config {
 		}
 		return null;
 	}
-	public static void updateConfig(String pathname, String param, String value) {
+	public static void updateConfig(String pathname, String param, int v) {
 		FileWriter fw;
 		BufferedWriter bw = null;
+		String value = String.valueOf(v);
 		try {
 			fw = new FileWriter(new File(pathname));
 			bw = new BufferedWriter(fw);
@@ -57,6 +58,6 @@ public class Config {
 //			System.out.println(entry.getValue());
 //			
 //		}
-		updateConfig("src/main/resources/local_storage.txt", "current_page", "1");
+		updateConfig("src/main/resources/local_storage.txt", "current_page", 1);
 	}
 }
